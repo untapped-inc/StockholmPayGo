@@ -1,0 +1,5 @@
+Python Setup Steps
+
+1. Add Repo: sudo add-apt-repository ppa:kivy-team/kivy
+2. Update sudo apt-get update
+3. sudo apt-get install python3-kivy
