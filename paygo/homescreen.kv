@@ -1,32 +1,44 @@
 #    grid layout for the dashboard
 <FloatLayout>:
     orientation: 'lr-tb'
+    size:self.size
+    pos:self.pos
     canvas.before:
         Color:
             rgba: (.22, .25, .32, 1)
         Rectangle:
             size: self.size
             pos: self.pos
-    Label:
-        pos: self.parent.size
-        text: "PayGo Stockholm Edition"
-        font_size: 32
-        halign: 'center'
-        color: (.86, .98, .96, 1)
-        valign: 'center'
-#        label background: (.69, .72, .82, 1)
     ScrollView:
         canvas.before:
             Color:
                 rgba: (.89, .75, .83, 1)
             Rectangle:
                 size: self.size
-        size_hint: (1, .8)
-        pos: (0, 125)
+        size_hint: (.95, .8)
+        pos: (self.parent.width * .05, 125)
         GridLayout:
             size: self.parent.size
             pos: self.parent.pos
-            text: "test"
+            cols: 1
+            rows: 8
+            Label:
+                text: "test"
+                pos:
+            Label:
+                text: "test"
+            Label:
+                text: "test"
+            Label:
+                text: "test"
+            Label:
+                text: "test"
+            Label:
+                text: "test"
+            Label:
+                text: "test"
+            Label:
+                text: "test"
     Button:
         size_hint: (.15, .1)
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
@@ -38,19 +50,8 @@
         color: (.86, .98, .96, 1)
         background_normal: ''
         background_color: (.61,.62,.7, 1)
-#    ListView:
-#        size_hint: (.6, 1)
-#        orientation: 'vertical'
-#        Label:
-#            text: "Credits: $500"
-#        Label:
-#            text: "Rate Per Liter: $0.01"
-#    Button:
-#        size_hint: (.2, 1)
-#        halign: center
-#        Label:
-#            text: "Add Credit"
-#            halign: center
-#            Color:
-#                rgb: 219,249,244
-
+    Label:
+        pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.35
+        text: "PayGo Stockholm Edition"
+        font_size: 32
+        color: (.86, .98, .96, 1)
