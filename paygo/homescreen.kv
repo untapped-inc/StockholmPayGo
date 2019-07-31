@@ -5,41 +5,55 @@
     pos:self.pos
     canvas.before:
         Color:
-            rgba: (.22, .25, .32, 1)
+            rgba: (.11, .12, .09, 1) #(.22, .25, .32, 1)
         Rectangle:
             size: self.size
             pos: self.pos
     ScrollView:
+        id: homeScroll
+        size_hint: (.90, .7)
+        pos: (self.parent.width * .05,  creditsButton.top + 10)
         canvas.before:
             Color:
-                rgba: (.89, .75, .83, 1)
+#                rgba: (.89, .75, .83, 1) #salmon
+                rgba: (.22, .25, .32, 1)
             Rectangle:
-                size: self.size
-        size_hint: (.95, .8)
-        pos: (self.parent.width * .05, 125)
-        GridLayout:
-            size: self.parent.size
-            pos: self.parent.pos
-            cols: 1
-            rows: 8
-            Label:
-                text: "test"
-                pos:
-            Label:
-                text: "test"
-            Label:
-                text: "test"
-            Label:
-                text: "test"
-            Label:
-                text: "test"
-            Label:
-                text: "test"
-            Label:
-                text: "test"
-            Label:
-                text: "test"
+                size: homeScroll.size
+                pos: homeScroll.pos
+        Label:
+            id: dashboardText
+            size_hint: None, None
+            size: self.texture_size
+            text: "Credits Used: $1281 \r\n  3sdffffffffffffff \r\n ffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 3"
+            font_size: 32
+            color: (.61,.62,.7, 1)
+
+
+
+#        GridLayout:
+#            size: self.parent.size
+#            pos: self.parent.pos
+#            cols: 1
+#            rows: 8
+#            Label:
+#                text: "test"
+#                pos:
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
+#            Label:
+#                text: "test"
     Button:
+        id: creditsButton
         size_hint: (.15, .1)
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
 #        halign: 'center'
@@ -51,7 +65,8 @@
         background_normal: ''
         background_color: (.61,.62,.7, 1)
     Label:
+        id: dashboardLabel
         pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.35
         text: "PayGo Stockholm Edition"
-        font_size: 32
+        font_size: 50
         color: (.86, .98, .96, 1)
