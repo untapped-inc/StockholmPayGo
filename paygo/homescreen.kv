@@ -1,5 +1,6 @@
 #    grid layout for the dashboard
 <FloatLayout>:
+    id: test
     orientation: 'lr-tb'
     size:self.size
     pos:self.pos
@@ -10,77 +11,60 @@
             size: self.size
             pos: self.pos
     ScrollView:
-        id: homeScroll
+        id: home_scroll
         size_hint: (.75, .67)
         pos: (self.parent.width * .125,  creditsButton.top + 10)
         canvas.before:
             Color:
                 rgba: (.22, .25, .32, 1)
             Rectangle:
-                size: homeScroll.size
-                pos: homeScroll.pos
+                size: home_scroll.size
+                pos: home_scroll.pos
         GridLayout:
+            id: scroll_grid
             size_hint_y: None
             height: self.minimum_height
 #            minimum_height: self.height
             valign: "top"
             halign: "left"
-            pos:  homeScroll.pos
+            pos:  home_scroll.pos
             cols: 2
             rows: 10
             do_scroll_x: False
             do_scroll_y: True
             DashBoardLabel:
-                id: credit_label
                 text: "Credit Balance:"
-                halign: "left"
             DashBoardLabel:
-                id: "credit_balance_text"
-                halign: "left"
-                text: "tests"
-                width: credit_label.width / 2
+                id: credit_balance_text
             DashBoardLabel:
                 text: "Rate per Liter:"
-                halign: "left"
             DashBoardLabel:
                 id: "rate_text"
-                halign: "right"
             DashBoardLabel:
 #            should this be the last hour from the top of the hour, or the last 60 minutes?
                 text: "Average Flow Rate (Past Hour):"
             DashBoardLabel:
                 id: "average_flow_text"
-                halign: "right"
             DashBoardLabel:
                 text: "Volume Consumed (Past 24 Hours):"
-                halign: "left"
             DashBoardLabel:
                 id: "volume_24_text"
-                halign: "right"
             DashBoardLabel:
                 text: "Balance Consumed (Past 24 Hours):"
-                halign: "left"
             DashBoardLabel:
                 id: "balance_24_hours"
-                halign: "right"
             DashBoardLabel:
                 text: "Last ORP Reading:"
-                halign:"left"
             DashBoardLabel:
                 id: "orp_text"
-                halign: "right"
             DashBoardLabel:
                 text: "Last TDS Reading:"
-                halign: "left"
             DashBoardLabel:
                 id: "tds_text"
-                halign: "right"
             DashBoardLabel:
                 text: "Flowmeter Reading:"
-                halign: "left"
             DashBoardLabel:
                 id: "flowmeter_text"
-                halign: "right"
     Button:
         id: creditsButton
         size_hint: (.15, .1)

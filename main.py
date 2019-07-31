@@ -9,10 +9,11 @@ from kivy.config import Config
 def main():
     # start the user interface
     homescreen_instance = HomescreenApp()
-    # if __name__ == "__main__":
+    # start as a full screen
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
+
     homescreen_instance.run()
 
     # Get Demo
