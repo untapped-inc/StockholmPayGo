@@ -11,54 +11,81 @@
             pos: self.pos
     ScrollView:
         id: homeScroll
-        size_hint: (.90, .7)
-        pos: (self.parent.width * .05,  creditsButton.top + 10)
+        size_hint: (.75, .67)
+        pos: (self.parent.width * .125,  creditsButton.top + 10)
         canvas.before:
             Color:
-#                rgba: (.89, .75, .83, 1) #salmon
                 rgba: (.22, .25, .32, 1)
             Rectangle:
                 size: homeScroll.size
                 pos: homeScroll.pos
-        Label:
-            id: dashboardText
-            size_hint: None, None
-            size: self.texture_size
-            text: "Credits Used: $1281 \r\n  3sdffffffffffffff \r\n ffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 31 \r\n 2 \r\n 3sdffffffffffffffffffffffffffffffffffffffffffsdajfkdslafjkladsjlsjfkdlajfklsdfjksdajfklsdajflkjfkasdjfkldjfkdsjfkldsafjsddsflasdjfsd \r\n 3"
-            font_size: 32
-            color: (.61,.62,.7, 1)
-
-
-
-#        GridLayout:
-#            size: self.parent.size
-#            pos: self.parent.pos
-#            cols: 1
-#            rows: 8
-#            Label:
-#                text: "test"
-#                pos:
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
-#            Label:
-#                text: "test"
+        GridLayout:
+            size_hint_y: None
+            height: self.minimum_height
+#            minimum_height: self.height
+            valign: "top"
+            halign: "left"
+            pos:  homeScroll.pos
+            cols: 2
+            rows: 10
+            do_scroll_x: False
+            do_scroll_y: True
+            DashBoardLabel:
+                id: credit_label
+                text: "Credit Balance:"
+                halign: "left"
+            DashBoardLabel:
+                id: "credit_balance_text"
+                halign: "left"
+                text: "tests"
+                width: credit_label.width / 2
+            DashBoardLabel:
+                text: "Rate per Liter:"
+                halign: "left"
+            DashBoardLabel:
+                id: "rate_text"
+                halign: "right"
+            DashBoardLabel:
+#            should this be the last hour from the top of the hour, or the last 60 minutes?
+                text: "Average Flow Rate (Past Hour):"
+            DashBoardLabel:
+                id: "average_flow_text"
+                halign: "right"
+            DashBoardLabel:
+                text: "Volume Consumed (Past 24 Hours):"
+                halign: "left"
+            DashBoardLabel:
+                id: "volume_24_text"
+                halign: "right"
+            DashBoardLabel:
+                text: "Balance Consumed (Past 24 Hours):"
+                halign: "left"
+            DashBoardLabel:
+                id: "balance_24_hours"
+                halign: "right"
+            DashBoardLabel:
+                text: "Last ORP Reading:"
+                halign:"left"
+            DashBoardLabel:
+                id: "orp_text"
+                halign: "right"
+            DashBoardLabel:
+                text: "Last TDS Reading:"
+                halign: "left"
+            DashBoardLabel:
+                id: "tds_text"
+                halign: "right"
+            DashBoardLabel:
+                text: "Flowmeter Reading:"
+                halign: "left"
+            DashBoardLabel:
+                id: "flowmeter_text"
+                halign: "right"
     Button:
         id: creditsButton
         size_hint: (.15, .1)
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
-#        halign: 'center'
         anchor_x: 'center'
-#        pos: (350, 50)
         text: "Add Credits"
         font_size: 20
         color: (.86, .98, .96, 1)
@@ -70,3 +97,14 @@
         text: "PayGo Stockholm Edition"
         font_size: 50
         color: (.86, .98, .96, 1)
+
+#Custom Label Type
+<DashBoardLabel@Label>:
+    font_size: 38
+    color: (.61,.62,.7, 1)
+    text_size: self.size
+    valign: "center"
+    halign: "left"
+    size_hint_y: None
+    padding: 50, 1
+
