@@ -1,20 +1,49 @@
 #!/usr/bin/env python3
 
 import requests
-from paygo import Communication
+import sqlite3
+import threading
+from paygo import Communication, SensorData, Constants
+from paygo.Constants import DATABASE_NAME
 from paygo.Homescreen import HomescreenApp
 from kivy.config import Config
 
 
+def set_device_id():
+    conn = sqlite3.connect(DATABASE_NAME)
+    # a cursor is needed to write to the db
+    cur = conn.cursor()
+    # check to see if device id is already in existence or not
+    device_query = "SELECT DeviceID FROM Device LIMIT 1"
+    devices_exist = False
+    # there should only ever be one result, at most
+    for deviceID in cur.execute(device_query):
+        Constants.DEVICE_ID = deviceID[0]
+        devices_exist = True
+    if devices_exist is False:
+        # insert into the device table
+        cur.execute("INSERT INTO Device (DeviceID) values(?)", Constants.DEVICE_ID.__str__())
+
+
 def main():
-    # start the user interface
+    # object to manage the dashboard
     homescreen_instance = HomescreenApp()
     # start as a full screen
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
 
+    # set the device id if not already set (otherwise, retrieve it)
+    set_device_id()
+
+    # talk to the sensors and write to the DB
+    sensor_thread = threading.Thread(target=SensorData.SensorData.read_all_sensors())
+
+    # TODO: communication with the API
+
+    # start the User Interface
     homescreen_instance.run()
+    sensor_thread.start()
 
     # Get Demo
     #
