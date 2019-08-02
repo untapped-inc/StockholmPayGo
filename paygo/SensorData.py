@@ -1,5 +1,6 @@
 import sqlite3
 import time
+import threading
 import uuid
 from gpiozero import DigitalInputDevice, DigitalOutputDevice
 
@@ -26,15 +27,17 @@ class SensorData(object):
         global credit_balance_cache
         # read the latest balance from the database to start the credit balance cache
         for balance in cur.execute(GET_BALANCE_QUERY):
-            credit_balance_cache = balance  # (there's only one, at most)
+            credit_balance_cache = balance[0]  # (there's only one, at most)
         # turn on the circuit if the balance is used
-        if credit_balance_cache > 0:
+        if (credit_balance_cache > 0.0):
+            print("trying to turn on")  # TODO: remove this print
             relay_module = DigitalOutputDevice(RELAY_PIN, active_high=False, initial_value=False,
                                                pin_factory=None)
             relay_module.on()
 
         # loop until told to stop - read from the ORP, TDS, and write to the db along the way
         while continue_looping:
+            print("looping")
             orp_mv = read_from_orp()
             # insert into ORP
             cur.execute("""INSERT INTO ORP (ReadingID, Millivolts, Timestamp, DeviceID,
@@ -58,16 +61,23 @@ def set_flowmeter_callback():
     if Constants.IS_DEBUG:
         return
     else:
-        # an object to interface with the flowmeter
-        flowmeter_sensor = DigitalInputDevice(Constants.FLOWMETER_PIN, pull_up=False, active_state=None,
-                                              bounce_time=None, pin_factory=None)
-        # setup callbacks to detect the rising edges (
-        # https://gpiozero.readthedocs.io/en/stable/migrating_from_rpigpio.html)
-        flowmeter_sensor.when_activated = count_flowmeter_pulse
-
+        #start new thread for flowmeter
+        flowmeter_thread = threading.Thread(target=flowmeter_manager)
+        flowmeter_thread.start()
+        
+#this sets a callback to listen to the flowmeter, then ends in an infinite loop - this is to allow the thread to work solely on listening for the flowmeter 
+def flowmeter_manager():
+    # an object to interface with the flowmeter
+    flowmeter_sensor = DigitalInputDevice(Constants.FLOWMETER_PIN)
+    # setup callbacks to detect the rising edges (
+    # https://gpiozero.readthedocs.io/en/stable/migrating_from_rpigpio.html)
+    flowmeter_sensor.when_activated = count_flowmeter_pulse
+    while(True):
+        pass
 
 # function that is called every time a rising edge is detected on the flowmeter sensor
 def count_flowmeter_pulse():
+    print("flowmeter pulse!")  # todo: remove this
     conn = sqlite3.connect(DATABASE_NAME)
     cur = conn.cursor()
     # increment the water counter until the threshold is breached
@@ -80,7 +90,7 @@ def count_flowmeter_pulse():
     credit_balance_cache = calculate_balance(credit_balance_cache)
 
     # cut off the relay after a balance of zero is reached
-    if credit_balance_cache <= 0:
+    if credit_balance_cache <= 0.0:
         disconnect_relay()
 
     # check for threshold breach

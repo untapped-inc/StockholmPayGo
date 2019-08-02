@@ -26,15 +26,21 @@ def set_device_id():
                                                                                   Constants.PRICE_PER_ML))
         conn.commit()
 
-
-def main():
+#this function manages the user interface in its own thread, so as not to block the rest of the app
+def ui_execution():
     # object to manage the dashboard
     homescreen_instance = HomescreenApp()
+    
+    # start the User Interface
+    homescreen_instance.run()
+    while True:
+        pass
+    
+def main():
     # start as a full screen
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
-
     # set the device id if not already set (otherwise, retrieve it)
     set_device_id()
 
@@ -44,8 +50,9 @@ def main():
     # TODO: communication with the API
     comm_thread = threading.Thread(target=Communication.Communication.sync_with_server)
 
-    # start the User Interface
-    homescreen_instance.run()
+    ui_thread = threading.Thread(target=ui_execution)
+    
+    ui_thread.start()
     sensor_thread.start()
 
     # Get Demo
