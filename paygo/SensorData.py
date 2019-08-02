@@ -4,8 +4,8 @@ import uuid
 from gpiozero import DigitalInputDevice, DigitalOutputDevice
 
 from paygo import Constants
-from paygo.Constants import DATABASE_NAME, SENSOR_SLEEP_MS, ML_PER_PULSE, FLOWMETER_THRESHOLD, DEVICE_ID, \
-    FLOWMETER_UNITS, CREDITS_PER_ML, GET_BALANCE_QUERY, RELAY_PIN
+from paygo.Constants import DATABASE_NAME, ML_PER_PULSE, FLOWMETER_THRESHOLD, DEVICE_ID, \
+    FLOWMETER_UNITS, CREDITS_PER_ML, GET_BALANCE_QUERY, RELAY_PIN, SENSOR_SLEEP_SECONDS
 
 # global variable temporarily store the ml passing through the flowmeter until they can be written to the database
 flowmeter_milliliters_cache = 0.0
@@ -27,6 +27,11 @@ class SensorData(object):
         # read the latest balance from the database to start the credit balance cache
         for balance in cur.execute(GET_BALANCE_QUERY):
             credit_balance_cache = balance  # (there's only one, at most)
+        # turn on the circuit if the balance is used
+        if credit_balance_cache > 0:
+            relay_module = DigitalOutputDevice(RELAY_PIN, active_high=False, initial_value=False,
+                                               pin_factory=None)
+            relay_module.on()
 
         # loop until told to stop - read from the ORP, TDS, and write to the db along the way
         while continue_looping:
@@ -37,7 +42,7 @@ class SensorData(object):
                                                               Constants.DEVICE_ID))
             conn.commit()
             # sleep for a few minutes
-            time.sleep(SENSOR_SLEEP_MS)
+            time.sleep(SENSOR_SLEEP_SECONDS)
 
 
 def read_from_orp():
@@ -100,6 +105,7 @@ def calculate_balance(credit_balance):
 def disconnect_relay():
     # this object represents the relay board. Notice that active_high is false! This is because the relay should be
     # LOW to close the circuit and turn on the motor!
-    relay_module = DigitalOutputDevice(RELAY_PIN, active_high=False, initial_value=False, pin_factory=None)
+    relay_module = DigitalOutputDevice(RELAY_PIN, active_high=False, initial_value=False,
+                                       pin_factory=None)
     # turns the relay off
     relay_module.off()

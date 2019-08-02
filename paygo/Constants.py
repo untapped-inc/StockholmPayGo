@@ -1,6 +1,8 @@
-DATABASE_NAME = "/home/jj/paygo.db"
+from pathlib import Path
+
+DATABASE_NAME = (Path(__file__).parent.parent.__str__() + "/paygo.db")
 # sleep time in milliseconds for the sensor reads
-SENSOR_SLEEP_MS = 1000  # TODO: change to 5 minutes after testing is done
+SENSOR_SLEEP_SECONDS = 10  # TODO: change to 5 minutes after testing is done
 DEVICE_ID = "1"
 # price in USD per ml of water
 PRICE_PER_ML = 0.0

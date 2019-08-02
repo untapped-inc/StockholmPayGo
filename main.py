@@ -39,10 +39,10 @@ def main():
     set_device_id()
 
     # talk to the sensors and write to the DB
-    sensor_thread = threading.Thread(target=SensorData.SensorData.read_all_sensors())
+    sensor_thread = threading.Thread(target=SensorData.SensorData.read_all_sensors)
 
     # TODO: communication with the API
-    comm_thread = threading.Thread(target=Communication.Communication.sync_with_server())
+    comm_thread = threading.Thread(target=Communication.Communication.sync_with_server)
 
     # start the User Interface
     homescreen_instance.run()
