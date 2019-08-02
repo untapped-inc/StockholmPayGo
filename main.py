@@ -26,16 +26,18 @@ def set_device_id():
                                                                                   Constants.PRICE_PER_ML))
         conn.commit()
 
-#this function manages the user interface in its own thread, so as not to block the rest of the app
+
+# this function manages the user interface in its own thread, so as not to block the rest of the app
 def ui_execution():
     # object to manage the dashboard
     homescreen_instance = HomescreenApp()
-    
+
     # start the User Interface
     homescreen_instance.run()
     while True:
         pass
-    
+
+
 def main():
     # start as a full screen
     Config.set('graphics', 'fullscreen', 'auto')
@@ -51,7 +53,7 @@ def main():
     comm_thread = threading.Thread(target=Communication.Communication.sync_with_server)
 
     ui_thread = threading.Thread(target=ui_execution)
-    
+
     ui_thread.start()
     sensor_thread.start()
 

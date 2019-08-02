@@ -29,7 +29,7 @@ class SensorData(object):
         for balance in cur.execute(GET_BALANCE_QUERY):
             credit_balance_cache = balance[0]  # (there's only one, at most)
         # turn on the circuit if the balance is used
-        if (credit_balance_cache > 0.0):
+        if credit_balance_cache > 0.0:
             print("trying to turn on")  # TODO: remove this print
             relay_module = DigitalOutputDevice(RELAY_PIN, active_high=False, initial_value=False,
                                                pin_factory=None)
@@ -61,19 +61,22 @@ def set_flowmeter_callback():
     if Constants.IS_DEBUG:
         return
     else:
-        #start new thread for flowmeter
+        # start new thread for flowmeter
         flowmeter_thread = threading.Thread(target=flowmeter_manager)
         flowmeter_thread.start()
-        
-#this sets a callback to listen to the flowmeter, then ends in an infinite loop - this is to allow the thread to work solely on listening for the flowmeter 
+
+
+# this sets a callback to listen to the flowmeter, then ends in an infinite loop - this is to allow the thread to
+# work solely on listening for the flowmeter
 def flowmeter_manager():
     # an object to interface with the flowmeter
     flowmeter_sensor = DigitalInputDevice(Constants.FLOWMETER_PIN)
     # setup callbacks to detect the rising edges (
     # https://gpiozero.readthedocs.io/en/stable/migrating_from_rpigpio.html)
     flowmeter_sensor.when_activated = count_flowmeter_pulse
-    while(True):
+    while True:
         pass
+
 
 # function that is called every time a rising edge is detected on the flowmeter sensor
 def count_flowmeter_pulse():
