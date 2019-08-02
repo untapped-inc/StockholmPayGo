@@ -196,3 +196,7 @@ dmypy.json
 
 *.pdf
 *.odt
+/NewGETBody.png
+/NewPOSTRequestBody.png
+/Original_GET.png
+/OriginalRequestBodyPOST.png

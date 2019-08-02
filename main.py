@@ -22,7 +22,9 @@ def set_device_id():
         devices_exist = True
     if devices_exist is False:
         # insert into the device table
-        cur.execute("INSERT INTO Device (DeviceID) values(?)", Constants.DEVICE_ID.__str__())
+        cur.execute("INSERT INTO Device (DeviceID, PricePerML) values((?),(?))", (Constants.DEVICE_ID.__str__(),
+                                                                                  Constants.PRICE_PER_ML))
+        conn.commit()
 
 
 def main():
@@ -40,6 +42,7 @@ def main():
     sensor_thread = threading.Thread(target=SensorData.SensorData.read_all_sensors())
 
     # TODO: communication with the API
+    comm_thread = threading.Thread(target=Communication.Communication.sync_with_server())
 
     # start the User Interface
     homescreen_instance.run()
