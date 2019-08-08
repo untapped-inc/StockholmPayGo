@@ -1,5 +1,10 @@
+<KivyManager@FloatLayout>:
+    HomeScreen:
+    AddScreen:
+
 #    grid layout for the dashboard
-<FloatLayout>:
+<HomeScreen@FloatLayout>:
+    name: "home_screen"
     orientation: 'lr-tb'
     size:self.size
     pos:self.pos
@@ -72,30 +77,50 @@
                 text: "Last DownSync Timestamp:"
             DashBoardLabel:
                 id: downsync_text
-    Button:
+    PayGoButton:
         id: creditsButton
-        size_hint: (.30, .17)
-        pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
-        anchor_x: 'center'
         text: "Add Credits"
-        font_size: 20
-        color: (.86, .98, .96, 1)
-        background_normal: ''
-        background_color: (.61,.62,.7, 1)
-    Label:
+        on_release: app.root.current = "add_screen"
+        pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
+    Title:
         id: dashboardLabel
-        pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.35
         text: "PayGo Stockholm Edition"
-        font_size: 50
-        color: (.86, .98, .96, 1)
+
 
 #Custom Label Type
 <DashBoardLabel@Label>:
-    font_size: 22
+    font_size: 20
     color: (.61,.62,.7, 1)
     text_size: self.size
     valign: "center"
     halign: "left"
     size_hint_y: None
     padding: 50, 1
+
+<Title@Label>:
+    pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.35
+    font_size: 50
+    color: (.86, .98, .96, 1)
+
+<PayGoButton@Button>:
+    size_hint: (.30, .17)
+    anchor_x: 'center'
+    font_size: 20
+    color: (.86, .98, .96, 1)
+    background_normal: ''
+    background_color: (.61,.62,.7, 1)
+
+<AddScreen>:
+    name: 'add_screen'
+    Title:
+        text: "Add Credit"
+
+    PayGoButton:
+        on_release: app.root.current = 'home_screen'
+        text: 'Cancel'
+        pos: (max(self.parent.center)/4), min(root.size)*.01
+
+    PayGoButton:
+        text: 'Buy'
+        pos: (max(self.parent.center) + (max(self.parent.center)/4)), min(root.size)*.01
 

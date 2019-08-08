@@ -5,13 +5,28 @@ import time
 import kivy
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.widget import Widget
-from kivy.uix.button import Label
 from kivy.uix.floatlayout import FloatLayout
 from datetime import datetime
 
 from paygo import Constants
 from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE
+
+
+# placeholder object for the add credits screen
+class AddScreen(Screen):
+    pass
+
+
+# placeholder object for the home screen that's defined in homescreen.kv
+class HomeScreen(Screen):
+    pass
+
+
+# placeholder object for the KivyManager that's defined in the homescreen.kv
+class KivyManager(ScreenManager):
+    pass
 
 
 class HomescreenApp(App):
@@ -22,9 +37,9 @@ class HomescreenApp(App):
     last_downsync_time = None
 
     def build(self):
-        self.dashboard_object = FloatLayout()
-        self.dashboard_object.ids.rate_text.text = "hello world"
+        self.dashboard_object = KivyManager()
 
+        # manage the update process in another thread - the Clock scheduler in kivy always locks up my app
         update_thread = threading.Thread(target=self.refresh_ui)
 
         update_thread.start()
@@ -40,7 +55,7 @@ class HomescreenApp(App):
             rate = self.get_rate()
             volume_last_24_hours = self.get_volume_in_last_24_hours()
             if self.dashboard_object is not None:
-                print("2")
+                print("2")  # todo: remove
                 self.dashboard_object.ids.rate_text.text = rate.__str__()
                 self.dashboard_object.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
                 self.dashboard_object.ids.rate_text.text = "$" + rate.__str__()
@@ -58,33 +73,6 @@ class HomescreenApp(App):
                     self.dashboard_object.ids.upsync_text.text = datetime.fromtimestamp(self.last_upsync_time).__str__()
             time.sleep(UI_UPDATE_RATE)
 
-    # def refresh_ui(self):
-    #     # open a db connection for later querying
-    #     conn = sqlite3.connect(DATABASE_NAME)
-    #     # a cursor is needed to talk to the db
-    #     self.cur = conn.cursor()
-    #     print("refreshing")
-    #     # pull rate and consumption into separate variables for later use
-    #     rate = self.get_rate()
-    #     volume_last_24_hours = self.get_volume_in_last_24_hours()
-    #
-    #     if self.dashboard_object is not None:
-    #         # self.dashboard_object.ids.credit_balance_text.text = "test"
-    #         # "$" + self.get_balance() + " (USD)"
-    #         self.dashboard_object.ids.rate_text.text = "$" + rate.__str__()
-    #         self.dashboard_object.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
-    #         self.dashboard_object.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
-    #         self.dashboard_object.ids.balance_24_hours.text = "$" + (volume_last_24_hours * rate).__str__()
-    #         self.dashboard_object.ids.orp_text.text = self.get_orp().__str__() + " mv"
-    #         self.dashboard_object.ids.tds_text.text = self.get_tds().__str__() + " mv"
-    #         # convert unix timestamps to human-readable times for this
-    #         self.dashboard_object.ids.flowmeter_text.text = datetime.fromtimestamp(self.get_flowmeter()).__str__()
-    #         if self.last_downsync_time is not None:
-    #             self.dashboard_object.ids.downsync_text.text = datetime.fromtimestamp(
-    #                 self.last_downsync_time).__str__()
-    #         if self.last_upsync_time is not None:
-    #             self.dashboard_object.ids.upsync_text.text = datetime.fromtimestamp(self.last_upsync_time).__str__()
-    #
     # return balance in US Dollars
     def get_balance(self):
         balance = 0.0
