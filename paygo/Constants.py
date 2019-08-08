@@ -19,8 +19,8 @@ CREDITS_PER_ML = 0.02
 SECONDS_IN_HOUR = 3600
 
 # PINOUT
-FLOWMETER_PIN = "GPIO14"
-RELAY_PIN = "GPIO4"
+FLOWMETER_PIN = "GPIO21"
+RELAY_PIN = "GPIO26"
 
 # retrieve the latest credit balance from the database
 GET_BALANCE_QUERY = "SELECT CreditBalance FROM CreditAuditLog ORDER BY Timestamp DESC LIMIT 1"

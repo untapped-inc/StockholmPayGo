@@ -75,6 +75,7 @@ def flowmeter_manager():
     # https://gpiozero.readthedocs.io/en/stable/migrating_from_rpigpio.html)
     flowmeter_sensor.when_activated = count_flowmeter_pulse
     while True:
+        # create an infinite loop so that the flowmeter listerner never dies
         pass
 
 
