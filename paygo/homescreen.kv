@@ -1,6 +1,5 @@
 #    grid layout for the dashboard
-<Dashboard@FloatLayout>:
-    id: test
+<FloatLayout>:
     orientation: 'lr-tb'
     size:self.size
     pos:self.pos
@@ -12,7 +11,7 @@
             pos: self.pos
     ScrollView:
         id: home_scroll
-        size_hint: (.75, .67)
+        size_hint: (.75, .60)
         pos: (self.parent.width * .125,  creditsButton.top + 10)
         canvas.before:
             Color:
@@ -75,7 +74,7 @@
                 id: downsync_text
     Button:
         id: creditsButton
-        size_hint: (.15, .1)
+        size_hint: (.30, .17)
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
         anchor_x: 'center'
         text: "Add Credits"
@@ -92,7 +91,7 @@
 
 #Custom Label Type
 <DashBoardLabel@Label>:
-    font_size: 38
+    font_size: 22
     color: (.61,.62,.7, 1)
     text_size: self.size
     valign: "center"
