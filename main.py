@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-
-import requests
+import time
 import sqlite3
 import threading
+
+from kivy.clock import Clock
+
 from paygo import Communication, SensorData, Constants
 from paygo.Constants import DATABASE_NAME
 from paygo.Homescreen import HomescreenApp
@@ -27,15 +29,9 @@ def set_device_id():
         conn.commit()
 
 
-# this function manages the user interface in its own thread, so as not to block the rest of the app
 def ui_execution():
-    # object to manage the dashboard
     homescreen_instance = HomescreenApp()
-
-    # start the User Interface
     homescreen_instance.run()
-    while True:
-        pass
 
 
 def main():
@@ -52,10 +48,12 @@ def main():
     # TODO: communication with the API
     comm_thread = threading.Thread(target=Communication.Communication.sync_with_server)
 
+    sensor_thread.start()
+
+    # object to manage the dashboard
     ui_thread = threading.Thread(target=ui_execution)
 
     ui_thread.start()
-    sensor_thread.start()
 
     # Get Demo
     #
