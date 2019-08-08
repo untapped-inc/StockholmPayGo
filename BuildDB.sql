@@ -1,10 +1,4 @@
-﻿-- Script to build SQL Lite database on Raspberry Pi
-
--- Paygo Stockholm Edition Schema
-
--- Table to Store the readings from the oxidative
--- reduction potential sensor in millivolts
-CREATE TABLE "ORP" (
+﻿CREATE TABLE "ORP" (
     "ReadingID" string  NOT NULL ,
     "Millivolts" int  NOT NULL ,
     "Timestamp" int  NOT NULL ,

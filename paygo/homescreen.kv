@@ -1,5 +1,5 @@
 #    grid layout for the dashboard
-<FloatLayout>:
+<Dashboard@FloatLayout>:
     id: test
     orientation: 'lr-tb'
     size:self.size
@@ -29,7 +29,7 @@
             halign: "left"
             pos:  home_scroll.pos
             cols: 2
-            rows: 10
+            rows: 11
             do_scroll_x: False
             do_scroll_y: True
             DashBoardLabel:
@@ -62,9 +62,17 @@
             DashBoardLabel:
                 id: tds_text
             DashBoardLabel:
-                text: "Flowmeter Reading:"
+                text: "Last Flowmeter Timestamp:"
             DashBoardLabel:
                 id: flowmeter_text
+            DashBoardLabel:
+                text: "Last UpSync Timestamp:"
+            DashBoardLabel:
+                id: upsync_text
+            DashBoardLabel:
+                text: "Last DownSync Timestamp:"
+            DashBoardLabel:
+                id: downsync_text
     Button:
         id: creditsButton
         size_hint: (.15, .1)

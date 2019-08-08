@@ -15,6 +15,8 @@ FLOWMETER_THRESHOLD = 100
 FLOWMETER_UNITS = "milliliters"
 # how many credits buy how many milliliters
 CREDITS_PER_ML = 0.02
+# total seconds in an hour
+SECONDS_IN_HOUR = 3600
 
 # PINOUT
 FLOWMETER_PIN = "GPIO14"
@@ -22,3 +24,6 @@ RELAY_PIN = "GPIO4"
 
 # retrieve the latest credit balance from the database
 GET_BALANCE_QUERY = "SELECT CreditBalance FROM CreditAuditLog ORDER BY Timestamp DESC LIMIT 1"
+
+# how often the UI refreshes itself (in seconds)
+UI_UPDATE_RATE = 5

@@ -1,6 +1,11 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
+# ignore image files
+*.png
+
+#ignore the 3d printing folder
+3D Printing/*
 
 .idea/*
 # User-specific stuff
