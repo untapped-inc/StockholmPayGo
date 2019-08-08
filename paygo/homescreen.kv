@@ -14,16 +14,10 @@
         Rectangle:
             size: self.size
             pos: self.pos
-    ScrollView:
+    PayGoView:
         id: home_scroll
-        size_hint: (.75, .60)
         pos: (self.parent.width * .125,  creditsButton.top + 10)
-        canvas.before:
-            Color:
-                rgba: (.22, .25, .32, 1)
-            Rectangle:
-                size: home_scroll.size
-                pos: home_scroll.pos
+
         GridLayout:
             id: scroll_grid
             size_hint_y: None
@@ -86,6 +80,14 @@
         id: dashboardLabel
         text: "PayGo Stockholm Edition"
 
+<PayGoView@ScrollView>:
+    size_hint: (.75, .60)
+    canvas.before:
+        Color:
+            rgba: (.22, .25, .32, 1)
+        Rectangle:
+            size: root.size
+            pos: root.pos
 
 #Custom Label Type
 <DashBoardLabel@Label>:
@@ -112,15 +114,29 @@
 
 <AddScreen>:
     name: 'add_screen'
+    orientation: 'lr-tb'
+    size:self.size
+    pos:self.pos
+    canvas.before:
+        Color:
+            rgba: (.11, .12, .09, 1) #(.22, .25, .32, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
     Title:
         text: "Add Credit"
 
+    PayGoView:
+        pos: (self.parent.width * .125,  pay_go_button.top + 10)
+        DashBoardLabel:
+            text: "Hello World!!"
+
     PayGoButton:
+        id: pay_go_button
         on_release: app.root.current = 'home_screen'
         text: 'Cancel'
         pos: (max(self.parent.center)/4), min(root.size)*.01
 
     PayGoButton:
         text: 'Buy'
-        pos: (max(self.parent.center) + (max(self.parent.center)/4)), min(root.size)*.01
-
+        pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
