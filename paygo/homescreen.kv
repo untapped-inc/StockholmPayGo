@@ -1,6 +1,7 @@
 <KivyManager@FloatLayout>:
     HomeScreen:
     AddScreen:
+    ConfirmPurchase:
 
 #    grid layout for the dashboard
 <HomeScreen@FloatLayout>:
@@ -107,7 +108,7 @@
 <PayGoButton@Button>:
     size_hint: (.30, .17)
     anchor_x: 'center'
-    font_size: 20
+    font_size: 48
     color: (.86, .98, .96, 1)
     background_normal: ''
     background_color: (.61,.62,.7, 1)
@@ -125,18 +126,51 @@
             pos: self.pos
     Title:
         text: "Add Credit"
-
     PayGoView:
         pos: (self.parent.width * .125,  pay_go_button.top + 10)
         DashBoardLabel:
             text: "Hello World!!"
-
     PayGoButton:
         id: pay_go_button
         on_release: app.root.current = 'home_screen'
         text: 'Cancel'
         pos: (max(self.parent.center)/4), min(root.size)*.01
+    PayGoButton:
+        text: 'Purchase'
+        on_release: app.root.current = 'confirm_screen'
+        pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
+
+<ConfirmPurchase>:
+    name: "confirm_screen"
+    orientation: 'lr-tb'
+    size:self.size
+    pos:self.pos
+    canvas.before:
+        Color:
+            rgba: (.11, .12, .09, 1) #(.22, .25, .32, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Title:
+        text: "Warning!"
+    PayGoView:
+        pos: (self.parent.width * .125, back_to_add.top +  10)
+        Label:
+#            pos: (10, self.parent.top - (self.parent.height/2))
+            text: "You are about to purchase $X.XX of water credit! Press Confirm to continue. Otherwise, press Cancel."
+            font_size: 52
+            halign: "center"
+            valign: "center"
+            text_size: self.size
 
     PayGoButton:
-        text: 'Buy'
+        id: back_to_add
+        on_release: app.root.current = 'add_screen'
+        text: 'Cancel'
+        pos: (max(self.parent.center)/4), min(root.size)*.01
+    PayGoButton:
+        text: 'Confirm'
+        on_release: app.root.current = 'home_screen'
         pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
+
+# Button for the Add Balance Options

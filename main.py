@@ -3,6 +3,7 @@ import time
 import sqlite3
 import threading
 
+from kivy.app import App
 from kivy.clock import Clock
 
 from paygo import Communication, SensorData, Constants
@@ -32,6 +33,7 @@ def set_device_id():
 def ui_execution():
     homescreen_instance = HomescreenApp()
     homescreen_instance.run()
+    App.get_running_app().root_window.minimize()
 
 
 def main():

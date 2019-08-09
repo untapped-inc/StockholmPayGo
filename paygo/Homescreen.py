@@ -24,6 +24,10 @@ class HomeScreen(Screen):
     pass
 
 
+class ConfirmPurchase(Screen):
+    pass
+
+
 # placeholder object for the KivyManager that's defined in the homescreen.kv
 class KivyManager(ScreenManager):
     pass
