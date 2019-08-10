@@ -42,7 +42,7 @@ class HomescreenApp(App):
 
     def build(self):
         self.dashboard_object = KivyManager()
-
+        print("build")
         # manage the update process in another thread - the Clock scheduler in kivy always locks up my app
         update_thread = threading.Thread(target=self.refresh_ui)
 
@@ -59,7 +59,7 @@ class HomescreenApp(App):
             rate = self.get_rate()
             volume_last_24_hours = self.get_volume_in_last_24_hours()
             if self.dashboard_object is not None:
-                print("2")  # todo: remove
+                print(self.dashboard_object)  # todo: remove
                 self.dashboard_object.ids.rate_text.text = rate.__str__()
                 self.dashboard_object.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
                 self.dashboard_object.ids.rate_text.text = "$" + rate.__str__()
@@ -79,9 +79,13 @@ class HomescreenApp(App):
 
     # return balance in US Dollars
     def get_balance(self):
+        new_conn = sqlite3.connect(DATABASE_NAME)
+        # a cursor is needed to talk to the db
+        new_cursor = new_conn.cursor()
+
         balance = 0.0
         # get the latest balance out of the database
-        balance_query = self.cur.execute(GET_BALANCE_QUERY)
+        balance_query = new_cursor.execute(GET_BALANCE_QUERY)
 
         for data in balance_query:
             balance = data[0]
@@ -157,3 +161,51 @@ class HomescreenApp(App):
                 timestamp = data[0]
 
         return timestamp
+
+    def add_credit_button_click(self, button_text):
+        # should only be one active child
+        text_display = self.dashboard_object.children[0].ids.add_amount.text
+        # remove the dollar sign (the first character)
+        text_display = text_display[1:]
+        if button_text == '<':
+            if len(text_display) > 1:
+                # remove the last character
+                text_display = text_display[:-1]
+            else:
+                text_display = "0"
+            self.update_new_balance(text_display)
+        else:
+            # ignore multiple decimal points
+            if not (text_display.count('.') > 0 and button_text == '.'):
+                text_display += button_text
+                # todo: check to make sure that the display text doesn't consist of only a decimal point
+                self.update_new_balance(text_display)
+        # make sure that we don't have a weird number with a 0 in the front
+        if len(text_display) > 1 and text_display[0] == '0' and text_display[1] != '.':
+            text_display = text_display[1:]
+
+        # reassign
+        self.dashboard_object.children[0].ids.add_amount.text = "$" + text_display
+
+    # helper function to update the new balance on the add credits menu
+    def update_new_balance(self, text_display):
+        new_money = float(text_display)
+        old_money = float(self.get_balance())
+        try:
+            self.dashboard_object.children[0].ids.new_balance_text.text = "$" + (new_money + old_money).__str__()
+        except Exception:
+            print("This only is to be used within the add credits screen")
+
+    def confirm_transaction(self, new_credit):
+        print("confirm")
+        # setup the message
+        try:
+            # confirmation screen is the 3rd in the array - probably need to find a better way to do this in the future
+            self.root.screens[2].ids.confirmation_text.text = "You are about to purchase " + new_credit + \
+                                                              " of water" \
+                                                              " credit! Press Confirm to continue. Otherwise, " \
+                                                              "press Cancel. "
+        except Exception:
+            print("Error confirming transaction")
+        # move to the next screen
+        self.root.current = 'confirm_screen'

@@ -5,7 +5,7 @@
 
 #    grid layout for the dashboard
 <HomeScreen@FloatLayout>:
-    name: "home_screen"
+    name: 'home_screen'
     orientation: 'lr-tb'
     size:self.size
     pos:self.pos
@@ -75,7 +75,7 @@
     PayGoButton:
         id: creditsButton
         text: "Add Credits"
-        on_release: app.root.current = "add_screen"
+        on_release: app.root.current = 'add_screen'
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
     Title:
         id: dashboardLabel
@@ -101,19 +101,20 @@
     padding: 50, 1
 
 <Title@Label>:
-    pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.35
+    pos: (max(self.parent.center) - (self.width/2)), min(root.size) * 0.38
     font_size: 50
     color: (.86, .98, .96, 1)
 
 <PayGoButton@Button>:
     size_hint: (.30, .17)
     anchor_x: 'center'
-    font_size: 48
+    font_size: 40
     color: (.86, .98, .96, 1)
     background_normal: ''
     background_color: (.61,.62,.7, 1)
 
 <AddScreen>:
+    id: add_screen
     name: 'add_screen'
     orientation: 'lr-tb'
     size:self.size
@@ -128,8 +129,84 @@
         text: "Add Credit"
     PayGoView:
         pos: (self.parent.width * .125,  pay_go_button.top + 10)
-        DashBoardLabel:
-            text: "Hello World!!"
+        GridLayout:
+            cols: 1
+            rows: 4
+            size: self.parent.size
+            GridLayout:
+                cols: 2
+                rows: 2
+                top: balance_grid.top+ balance_grid.height
+                DashBoardLabel:
+                    valign: 'top'
+                    id: old_balance_label
+                    text: "Old Balance: "
+                    width: self.parent.width/2
+                DashBoardLabel:
+                    valign: 'top'
+                    id: old_balance_text
+                    text: "$" + app.get_balance()
+                    width: self.parent.width/2
+                DashBoardLabel:
+                    valign: 'top'
+                    id: new_balance_label
+                    text: "New Balance: "
+                    width: self.parent.width/2
+                DashBoardLabel:
+                    valign: 'top'
+                    id: new_balance_text
+                    text: "$" + app.get_balance()
+                    width: self.parent.width/2
+            GridLayout:
+                id: balance_grid
+                rows: 1
+                cols: 1
+#                height: self.parent.height * .25
+
+                canvas.before:
+                    Color:
+                        rgba: (0, 0, 0, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                DashBoardLabel:
+                    id: add_amount
+                    text: "$"
+                    font_size: 30
+                    halign: "left"
+#                    size:self.parent.size
+            GridLayout:
+#                pos: (self.parent.x, self.parent.top - self.parent.height)
+#                height: self.parent.height * .5
+                rows: 1
+                cols: 6
+                CalculatorButton:
+                    text: "1"
+                CalculatorButton:
+                    text: "2"
+                CalculatorButton:
+                    text: "3"
+                CalculatorButton:
+                    text: "4"
+                CalculatorButton:
+                    text: "5"
+                CalculatorButton:
+                    text: "6"
+            GridLayout:
+                rows: 1
+                cols: 6
+                CalculatorButton:
+                    text: "7"
+                CalculatorButton:
+                    text: "8"
+                CalculatorButton:
+                    text: "9"
+                CalculatorButton:
+                    text: "."
+                CalculatorButton:
+                    text: "0"
+                CalculatorButton:
+                    text: "<"
     PayGoButton:
         id: pay_go_button
         on_release: app.root.current = 'home_screen'
@@ -137,7 +214,7 @@
         pos: (max(self.parent.center)/4), min(root.size)*.01
     PayGoButton:
         text: 'Purchase'
-        on_release: app.root.current = 'confirm_screen'
+        on_release: app.confirm_transaction(add_amount.text)
         pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
 
 <ConfirmPurchase>:
@@ -156,9 +233,9 @@
     PayGoView:
         pos: (self.parent.width * .125, back_to_add.top +  10)
         Label:
+            id: confirmation_text
 #            pos: (10, self.parent.top - (self.parent.height/2))
-            text: "You are about to purchase $X.XX of water credit! Press Confirm to continue. Otherwise, press Cancel."
-            font_size: 52
+            font_size: 48
             halign: "center"
             valign: "center"
             text_size: self.size
@@ -173,4 +250,6 @@
         on_release: app.root.current = 'home_screen'
         pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
 
-# Button for the Add Balance Options
+<CalculatorButton@Button>
+    font_size: 36
+    on_release: app.add_credit_button_click(self.text)

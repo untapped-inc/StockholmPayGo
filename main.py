@@ -33,7 +33,6 @@ def set_device_id():
 def ui_execution():
     homescreen_instance = HomescreenApp()
     homescreen_instance.run()
-    App.get_running_app().root_window.minimize()
 
 
 def main():
