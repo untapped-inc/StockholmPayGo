@@ -6,7 +6,7 @@ from gpiozero import DigitalInputDevice, DigitalOutputDevice
 
 from paygo import Constants
 from paygo.Constants import DATABASE_NAME, ML_PER_PULSE, FLOWMETER_THRESHOLD, DEVICE_ID, \
-    FLOWMETER_UNITS, CREDITS_PER_ML, GET_BALANCE_QUERY, RELAY_PIN, SENSOR_SLEEP_SECONDS
+    FLOWMETER_UNITS, CREDITS_PER_ML, GET_BALANCE_QUERY, RELAY_PIN, SENSOR_SLEEP_SECONDS, INSERT_CREDIT_LOG_SQL
 
 # global variable temporarily store the ml passing through the flowmeter until they can be written to the database
 flowmeter_milliliters_cache = 0.0
@@ -103,9 +103,8 @@ def count_flowmeter_pulse():
         cur.execute("INSERT INTO WaterLog (FlowmeterReadingID, DeviceID, Timestamp, Value, Units) values((?), (?), "
                     "(?), (?), (?))", (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()), flowmeter_milliliters_cache,
                                        FLOWMETER_UNITS))
-        cur.execute("INSERT INTO CreditAuditLog (CreditID, DeviceID, Timestamp, CreditBalance) values((?), (?), (?), "
-                    "(?))", (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()),
-                             credit_balance_cache))
+        cur.execute(INSERT_CREDIT_LOG_SQL, (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()),
+                                            credit_balance_cache))
         # commit both transactions
         conn.commit()
 

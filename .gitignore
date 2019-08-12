@@ -4,6 +4,11 @@
 # ignore image files
 *.png
 
+*.zip
+
+UIScreens/*
+/Copy of Raspberry Pi Desktop/*
+
 #ignore the 3d printing folder
 3D Printing/*
 

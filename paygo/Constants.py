@@ -24,6 +24,10 @@ RELAY_PIN = "GPIO26"
 
 # retrieve the latest credit balance from the database
 GET_BALANCE_QUERY = "SELECT CreditBalance FROM CreditAuditLog ORDER BY Timestamp DESC LIMIT 1"
+INSERT_CREDIT_LOG_SQL = "INSERT INTO CreditAuditLog (CreditID, DeviceID, Timestamp, CreditBalance) values((?), (?), " \
+                        "(?), (?))"
 
 # how often the UI refreshes itself (in seconds)
 UI_UPDATE_RATE = 5
+
+ERROR_CODE = -9999

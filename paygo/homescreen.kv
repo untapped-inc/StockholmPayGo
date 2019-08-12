@@ -2,6 +2,7 @@
     HomeScreen:
     AddScreen:
     ConfirmPurchase:
+    ErrorScreen:
 
 #    grid layout for the dashboard
 <HomeScreen@FloatLayout>:
@@ -75,7 +76,7 @@
     PayGoButton:
         id: creditsButton
         text: "Add Credits"
-        on_release: app.root.current = 'add_screen'
+        on_release: app.open_add_credit_screen()
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
     Title:
         id: dashboardLabel
@@ -145,7 +146,6 @@
                 DashBoardLabel:
                     valign: 'top'
                     id: old_balance_text
-                    text: "$" + app.get_balance()
                     width: self.parent.width/2
                 DashBoardLabel:
                     valign: 'top'
@@ -155,7 +155,6 @@
                 DashBoardLabel:
                     valign: 'top'
                     id: new_balance_text
-                    text: "$" + app.get_balance()
                     width: self.parent.width/2
             GridLayout:
                 id: balance_grid
@@ -171,7 +170,6 @@
                         pos: self.pos
                 DashBoardLabel:
                     id: add_amount
-                    text: "$"
                     font_size: 30
                     halign: "left"
 #                    size:self.parent.size
@@ -209,7 +207,7 @@
                     text: "<"
     PayGoButton:
         id: pay_go_button
-        on_release: app.root.current = 'home_screen'
+        on_release: app.cancel_add()
         text: 'Cancel'
         pos: (max(self.parent.center)/4), min(root.size)*.01
     PayGoButton:
@@ -234,7 +232,6 @@
         pos: (self.parent.width * .125, back_to_add.top +  10)
         Label:
             id: confirmation_text
-#            pos: (10, self.parent.top - (self.parent.height/2))
             font_size: 48
             halign: "center"
             valign: "center"
@@ -247,8 +244,18 @@
         pos: (max(self.parent.center)/4), min(root.size)*.01
     PayGoButton:
         text: 'Confirm'
-        on_release: app.root.current = 'home_screen'
+        on_release: app.purchase_credits()
         pos: (max(self.parent.center) + (max(self.parent.center)/7)), min(root.size)*.01
+
+<ErrorScreen>:
+    name: 'error_screen'
+    Title:
+        text: "Error Encountered! Please retry"
+    PayGoButton:
+        on_release: app.root.current = 'home_screen'
+        text: 'Cancel'
+        pos: (max(self.parent.center)), min(root.size)*.01
+
 
 <CalculatorButton@Button>
     font_size: 36

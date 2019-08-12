@@ -1,6 +1,8 @@
+import locale
 import sqlite3
 import threading
 import time
+import uuid
 
 import kivy
 from kivy.app import App
@@ -11,7 +13,7 @@ from kivy.uix.floatlayout import FloatLayout
 from datetime import datetime
 
 from paygo import Constants
-from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE
+from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE, DEVICE_ID, ERROR_CODE
 
 
 # placeholder object for the add credits screen
@@ -28,6 +30,10 @@ class ConfirmPurchase(Screen):
     pass
 
 
+class ErrorScreen(Screen):
+    pass
+
+
 # placeholder object for the KivyManager that's defined in the homescreen.kv
 class KivyManager(ScreenManager):
     pass
@@ -36,11 +42,15 @@ class KivyManager(ScreenManager):
 class HomescreenApp(App):
     dashboard_object = None
     cur = None
-    # dashboard_object = None
+
     last_upsync_time = None
     last_downsync_time = None
 
+    requested_credit = None
+
     def build(self):
+        # set the locale - this can later be changed to whatever it needs to be once the demo is over
+        locale.setlocale(locale.LC_ALL, '')
         self.dashboard_object = KivyManager()
         print("build")
         # manage the update process in another thread - the Clock scheduler in kivy always locks up my app
@@ -84,11 +94,15 @@ class HomescreenApp(App):
         new_cursor = new_conn.cursor()
 
         balance = 0.0
-        # get the latest balance out of the database
-        balance_query = new_cursor.execute(GET_BALANCE_QUERY)
+        try:
+            # get the latest balance out of the database
+            balance_query = new_cursor.execute(GET_BALANCE_QUERY)
 
-        for data in balance_query:
-            balance = data[0]
+            for data in balance_query:
+                balance = data[0]
+        except Exception as ex:
+            print("Exception retrieving balance: " + ex)
+            balance = ERROR_CODE
 
         return str(balance)
 
@@ -162,11 +176,32 @@ class HomescreenApp(App):
 
         return timestamp
 
+    # opens the add credits screen
+    def open_add_credit_screen(self):
+        self.root.current = 'add_screen'
+        old_balance = float(self.get_balance())
+        # set the current balance first
+        self.dashboard_object.children[0].ids.old_balance_text.text = locale.currency(old_balance)
+        if (self.requested_credit is not None):
+            self.dashboard_object.children[0].ids.add_amount.text = locale.currency(self.requested_credit)
+            # also reset the balance
+            self.dashboard_object.children[0].ids.new_balance_text.text = \
+                locale.currency(self.requested_credit + old_balance)
+        else:
+            # blank everything out
+            self.dashboard_object.children[0].ids.add_amount.text = ''
+            self.dashboard_object.children[0].ids.new_balance_text.text = ''
+
+    def cancel_add(self):
+        self.requested_credit = None
+        self.root.current = 'home_screen'
+
     def add_credit_button_click(self, button_text):
         # should only be one active child
         text_display = self.dashboard_object.children[0].ids.add_amount.text
         # remove the dollar sign (the first character)
         text_display = text_display[1:]
+
         if button_text == '<':
             if len(text_display) > 1:
                 # remove the last character
@@ -174,38 +209,76 @@ class HomescreenApp(App):
             else:
                 text_display = "0"
             self.update_new_balance(text_display)
-        else:
+        elif button_text == '.':
             # ignore multiple decimal points
-            if not (text_display.count('.') > 0 and button_text == '.'):
+            if not (text_display.count('.') > 0):
                 text_display += button_text
-                # todo: check to make sure that the display text doesn't consist of only a decimal point
-                self.update_new_balance(text_display)
+        else:
+            text_display += button_text
+            self.update_new_balance(text_display)
         # make sure that we don't have a weird number with a 0 in the front
         if len(text_display) > 1 and text_display[0] == '0' and text_display[1] != '.':
             text_display = text_display[1:]
 
-        # reassign
         self.dashboard_object.children[0].ids.add_amount.text = "$" + text_display
 
     # helper function to update the new balance on the add credits menu
     def update_new_balance(self, text_display):
-        new_money = float(text_display)
+        if text_display is not None:
+            new_money = float(text_display)
+        else:
+            # make new money zero if the display text is none
+            new_money = 0
         old_money = float(self.get_balance())
         try:
-            self.dashboard_object.children[0].ids.new_balance_text.text = "$" + (new_money + old_money).__str__()
+            self.dashboard_object.children[0].ids.new_balance_text.text = locale.currency(
+                new_money + old_money).__str__()
         except Exception:
             print("This only is to be used within the add credits screen")
 
     def confirm_transaction(self, new_credit):
-        print("confirm")
         # setup the message
         try:
+            # set the global variable to track the credits we are adding
+            # parse the float from the credit - first char is always a $ sign
+            self.requested_credit = float(new_credit[1:])
+
             # confirmation screen is the 3rd in the array - probably need to find a better way to do this in the future
-            self.root.screens[2].ids.confirmation_text.text = "You are about to purchase " + new_credit + \
+            self.root.screens[2].ids.confirmation_text.text = "You are about to purchase " + \
+                                                              locale.currency(self.requested_credit).__str__() + \
                                                               " of water" \
                                                               " credit! Press Confirm to continue. Otherwise, " \
                                                               "press Cancel. "
-        except Exception:
-            print("Error confirming transaction")
+        except Exception as ex:
+            print("Error confirming transaction: " + ex.__str__())
         # move to the next screen
         self.root.current = 'confirm_screen'
+
+    def purchase_credits(self):
+        # TODO: stop the motor and valve to prevent any credit consumption while this transaction occurs
+        purchase_conn = sqlite3.connect(DATABASE_NAME)
+        purchase_cursor = purchase_conn.cursor()
+
+        # get the latest balance from the credit log first
+        old_balance = float(self.get_balance())
+        # make sure that nothing goes wrong with either balance - if it does, return an error screen
+        success = False
+        if old_balance != ERROR_CODE:
+            try:
+                total_balance = old_balance + float(self.requested_credit)
+                purchase_cursor.execute(Constants.INSERT_CREDIT_LOG_SQL,
+                                        (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()),
+                                         total_balance))
+                purchase_conn.commit()
+                success = True
+            except Exception as ex:
+                print("Exception while inserting into credit log: " + ex.__str__())
+
+        # reset the requested credit back to None
+        self.requested_credit = None
+
+        if success:
+            # return to the home screen
+            self.root.current = 'home_screen'
+        else:
+            self.root.current = 'error_screen'
