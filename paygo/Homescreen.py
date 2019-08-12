@@ -182,7 +182,7 @@ class HomescreenApp(App):
         old_balance = float(self.get_balance())
         # set the current balance first
         self.dashboard_object.children[0].ids.old_balance_text.text = locale.currency(old_balance)
-        if (self.requested_credit is not None):
+        if self.requested_credit is not None:
             self.dashboard_object.children[0].ids.add_amount.text = locale.currency(self.requested_credit)
             # also reset the balance
             self.dashboard_object.children[0].ids.new_balance_text.text = \
