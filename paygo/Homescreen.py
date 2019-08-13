@@ -21,7 +21,7 @@ class AddScreen(Screen):
     pass
 
 
-# placeholder object for the home screen that's defined in homescreen.kv
+# # placeholder object for the home screen that's defined in homescreen.kv
 class HomeScreen(Screen):
     pass
 
@@ -69,22 +69,22 @@ class HomescreenApp(App):
             rate = self.get_rate()
             volume_last_24_hours = self.get_volume_in_last_24_hours()
             if self.dashboard_object is not None:
-                print(self.dashboard_object)  # todo: remove
-                self.dashboard_object.ids.rate_text.text = rate.__str__()
-                self.dashboard_object.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
-                self.dashboard_object.ids.rate_text.text = "$" + rate.__str__()
-                self.dashboard_object.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
-                self.dashboard_object.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
-                self.dashboard_object.ids.balance_24_hours.text = "$" + (volume_last_24_hours * rate).__str__()
-                self.dashboard_object.ids.orp_text.text = self.get_orp().__str__() + " mv"
-                self.dashboard_object.ids.tds_text.text = self.get_tds().__str__() + " mv"
+                home_screen = self.dashboard_object.children[0]
+                print(self.dashboard_object.children[0])  # todo: remove
+                home_screen.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
+                home_screen.ids.rate_text.text = "$" + rate.__str__()
+                home_screen.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
+                home_screen.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
+                home_screen.ids.balance_24_hours.text = "$" + (volume_last_24_hours * rate).__str__()
+                home_screen.ids.orp_text.text = self.get_orp().__str__() + " mv"
+                home_screen.ids.tds_text.text = self.get_tds().__str__() + " mv"
                 # convert unix timestamps to human-readable times for this
-                self.dashboard_object.ids.flowmeter_text.text = datetime.fromtimestamp(self.get_flowmeter()).__str__()
+                home_screen.ids.flowmeter_text.text = datetime.fromtimestamp(self.get_flowmeter()).__str__()
                 if self.last_downsync_time is not None:
-                    self.dashboard_object.ids.downsync_text.text = datetime.fromtimestamp(
+                    home_screen.ids.downsync_text.text = datetime.fromtimestamp(
                         self.last_downsync_time).__str__()
                 if self.last_upsync_time is not None:
-                    self.dashboard_object.ids.upsync_text.text = datetime.fromtimestamp(self.last_upsync_time).__str__()
+                    home_screen.ids.upsync_text.text = datetime.fromtimestamp(self.last_upsync_time).__str__()
             time.sleep(UI_UPDATE_RATE)
 
     # return balance in US Dollars

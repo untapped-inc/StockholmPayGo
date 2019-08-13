@@ -47,7 +47,6 @@ class SensorData(object):
             # sleep for a few minutes
             time.sleep(SENSOR_SLEEP_SECONDS)
 
-
 def read_from_orp():
     # if on the pi, return an actual value, if testing, return some dummy data
     if Constants.IS_DEBUG:
