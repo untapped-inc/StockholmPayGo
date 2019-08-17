@@ -6,6 +6,8 @@
 
 *.zip
 
+RaspberryPiPassword
+
 UIScreens/*
 /Copy of Raspberry Pi Desktop/*
 

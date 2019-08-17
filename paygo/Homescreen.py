@@ -68,8 +68,10 @@ class HomescreenApp(App):
         while True:
             rate = self.get_rate()
             volume_last_24_hours = self.get_volume_in_last_24_hours()
-            if self.dashboard_object is not None:
-                home_screen = self.dashboard_object.children[0]
+            home_screen = self.dashboard_object.children[0]
+            # check the the home screen variable is truly the home screen (and that we haven't moved to the
+            # add credit screen
+            if self.dashboard_object is not None and home_screen.name == 'home_screen':
                 print(self.dashboard_object.children[0])  # todo: remove
                 home_screen.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
                 home_screen.ids.rate_text.text = "$" + rate.__str__()

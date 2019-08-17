@@ -15,6 +15,7 @@ credit_balance_cache = 0.0
 
 
 class SensorData(object):
+
     @classmethod
     def read_all_sensors(cls):
         set_flowmeter_callback()
@@ -23,6 +24,9 @@ class SensorData(object):
         conn = sqlite3.connect(DATABASE_NAME)
         # a cursor is needed to write to the db
         cur = conn.cursor()
+
+        # object to read from the oxidative reduction potential sensor
+        orp_sensor = DigitalInputDevice(Constants.ORP_PIN)
 
         global credit_balance_cache
         # read the latest balance from the database to start the credit balance cache
@@ -38,7 +42,7 @@ class SensorData(object):
         # loop until told to stop - read from the ORP, TDS, and write to the db along the way
         while continue_looping:
             print("looping")
-            orp_mv = read_from_orp()
+            orp_mv = read_from_orp(orp_sensor)
             # insert into ORP
             cur.execute("""INSERT INTO ORP (ReadingID, Millivolts, Timestamp, DeviceID,
                 IsSynced) values((?), (?), (?), (?), 0) """, (uuid.uuid4().__str__(), orp_mv, int(time.time()),
@@ -47,13 +51,14 @@ class SensorData(object):
             # sleep for a few minutes
             time.sleep(SENSOR_SLEEP_SECONDS)
 
-def read_from_orp():
+
+def read_from_orp(sensor):
     # if on the pi, return an actual value, if testing, return some dummy data
     if Constants.IS_DEBUG:
         return 9999
     else:
-        # TODO: pull information from ORP
-        return 0
+        # pull information from ORP
+        return sensor.value
 
 
 def set_flowmeter_callback():
