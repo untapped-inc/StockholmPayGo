@@ -31,4 +31,13 @@ INSERT_CREDIT_LOG_SQL = "INSERT INTO CreditAuditLog (CreditID, DeviceID, Timesta
 # how often the UI refreshes itself (in seconds)
 UI_UPDATE_RATE = 5
 
+# decimal places to round to in the UI
+DIGITS_TO_ROUND = 3
+
 ERROR_CODE = -9999
+
+# these are for the ORP Sensor (DF Robot's SEN0165). They come from the arduino sample code at
+# https://wiki.dfrobot.com/Analog_ORP_Meter_SKU_SEN0165_
+ORP_SOURCE_MV = 5000
+ORP_COEFFICIENT_A = 30
+ORP_COEFFICIENT_B = 75

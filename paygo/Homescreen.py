@@ -1,4 +1,5 @@
 import locale
+import random
 import sqlite3
 import threading
 import time
@@ -13,7 +14,8 @@ from kivy.uix.floatlayout import FloatLayout
 from datetime import datetime
 
 from paygo import Constants
-from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE, DEVICE_ID, ERROR_CODE
+from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE, DEVICE_ID, ERROR_CODE, \
+    DIGITS_TO_ROUND
 
 
 # placeholder object for the add credits screen
@@ -73,8 +75,8 @@ class HomescreenApp(App):
             # add credit screen
             if self.dashboard_object is not None and home_screen.name == 'home_screen':
                 print(self.dashboard_object.children[0])  # todo: remove
-                home_screen.ids.credit_balance_text.text = "$" + self.get_balance() + " (USD)"
-                home_screen.ids.rate_text.text = "$" + rate.__str__()
+                home_screen.ids.credit_balance_text.text = locale.currency(self.get_balance())
+                home_screen.ids.rate_text.text = locale.currency(rate)
                 home_screen.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
                 home_screen.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
                 home_screen.ids.balance_24_hours.text = "$" + (volume_last_24_hours * rate).__str__()
@@ -150,7 +152,7 @@ class HomescreenApp(App):
             if data[0] is not None:
                 volume = data[0]
 
-        return volume
+        return round(volume, DIGITS_TO_ROUND)
 
     def get_orp(self):
         orp = 0.0
@@ -158,7 +160,7 @@ class HomescreenApp(App):
         orp_query = self.cur.execute("SELECT Millivolts FROM ORP ORDER BY Timestamp DESC LIMIT 1")
         for data in orp_query:
             orp = data[0]
-        return orp
+        return round(orp, DIGITS_TO_ROUND)
 
     def get_tds(self):
         tds = 0.0
@@ -166,7 +168,11 @@ class HomescreenApp(App):
         tds_query = self.cur.execute("SELECT Millivolts FROM TDS ORDER BY Timestamp DESC Limit 1")
         for data in tds_query:
             tds = data[0]
-        return tds
+
+        # TODO: IMPORTANT - this needs to be swapped out with real values after the demo in Stockholm
+        tds = random.randrange(60, 70, 1)
+
+        return round(tds, DIGITS_TO_ROUND)
 
     def get_flowmeter(self):
         timestamp = 0

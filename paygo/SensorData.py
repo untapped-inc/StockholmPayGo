@@ -2,6 +2,12 @@ import sqlite3
 import time
 import threading
 import uuid
+# used Adafruit documentation for ORP: https://learn.adafruit.com/adafruit-4-channel-adc-breakouts/python-circuitpython
+import board
+import busio
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
+
 from gpiozero import DigitalInputDevice, DigitalOutputDevice
 
 from paygo import Constants
@@ -12,6 +18,11 @@ from paygo.Constants import DATABASE_NAME, ML_PER_PULSE, FLOWMETER_THRESHOLD, DE
 flowmeter_milliliters_cache = 0.0
 # global variable to stores the user's credits between reads from the database
 credit_balance_cache = 0.0
+# used to pull the reading from the ADS1115 module (the ORP's ADC)
+i2c = busio.I2C(board.SCL, board.SDA)
+ads = ADS.ADS1115(i2c)
+# read from A0 on the ADC board
+chan = AnalogIn(ads, ADS.P0)
 
 
 class SensorData(object):
@@ -42,7 +53,7 @@ class SensorData(object):
         # loop until told to stop - read from the ORP, TDS, and write to the db along the way
         while continue_looping:
             print("looping")
-            orp_mv = read_from_orp(orp_sensor)
+            orp_mv = read_from_orp()
             # insert into ORP
             cur.execute("""INSERT INTO ORP (ReadingID, Millivolts, Timestamp, DeviceID,
                 IsSynced) values((?), (?), (?), (?), 0) """, (uuid.uuid4().__str__(), orp_mv, int(time.time()),
@@ -52,13 +63,24 @@ class SensorData(object):
             time.sleep(SENSOR_SLEEP_SECONDS)
 
 
-def read_from_orp(sensor):
+def read_from_orp():
     # if on the pi, return an actual value, if testing, return some dummy data
     if Constants.IS_DEBUG:
         return 9999
     else:
-        # pull information from ORP
-        return sensor.value
+        # thanks to the nice Adafruit library, we can pull the voltage out directly
+        orp_millivoltage = chan.voltage * 1000
+        #  the documentation on the SEN0165 sensor is poor, so I have to recreate the magic formula given to us at the
+        # poorly translated DF robot wiki:
+        #  orpValue=((30*(double)VOLTAGE*1000)-(75*avergearray(orpArray, ArrayLenth)*VOLTAGE*1000/1024))/75-OFFSET;
+        orp_millivolts = ((
+                                  (Constants.ORP_SOURCE_MV * Constants.ORP_COEFFICIENT_A) -
+                                  (Constants.ORP_COEFFICIENT_B * orp_millivoltage)
+                          ) / Constants.ORP_COEFFICIENT_B)
+        # I don't average the ORP Reading (unlike the arduino code, which does)
+        # TODO: let Jim know that this is for his specific sensor
+        # pull information from ORP -
+        return orp_millivolts
 
 
 def set_flowmeter_callback():
