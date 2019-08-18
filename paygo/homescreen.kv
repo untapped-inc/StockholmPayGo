@@ -29,13 +29,17 @@
             halign: "left"
             pos:  home_scroll.pos
             cols: 2
-            rows: 11
+            rows: 13
             do_scroll_x: False
             do_scroll_y: True
             DashBoardLabel:
                 text: "Credit Balance:"
             DashBoardLabel:
                 id: credit_balance_text
+            DashBoardLabel:
+                text: "Liters Remaining:"
+            DashBoardLabel:
+                id: liters_remaining_text
             DashBoardLabel:
                 text: "Rate per Liter:"
             DashBoardLabel:
@@ -73,6 +77,11 @@
                 text: "Last DownSync Timestamp:"
             DashBoardLabel:
                 id: downsync_text
+            DashBoardLabel:
+                text: "Pressure A:"
+            DashBoardLabel:
+#               this will someday be populated with an actual value
+                text: "0"
     PayGoButton:
         id: creditsButton
         text: "Add Credits"
@@ -80,7 +89,7 @@
         pos: (max(self.parent.center) - (self.width/2)), min(root.size)*.01
     Title:
         id: dashboardLabel
-        text: "PayGo Stockholm Edition"
+        text: "UNTAPPED PAYGO Controller"
 
 <PayGoView@ScrollView>:
     size_hint: (.75, .60)

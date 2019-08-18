@@ -13,7 +13,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
 from datetime import datetime
 
-from paygo import Constants
+from paygo import Constants, Config
 from paygo.Constants import DATABASE_NAME, GET_BALANCE_QUERY, SECONDS_IN_HOUR, UI_UPDATE_RATE, DEVICE_ID, ERROR_CODE, \
     DIGITS_TO_ROUND
 
@@ -69,19 +69,21 @@ class HomescreenApp(App):
         self.cur = conn.cursor()
         while True:
             rate = self.get_rate()
+            balance = self.get_balance()
             volume_last_24_hours = self.get_volume_in_last_24_hours()
             home_screen = self.dashboard_object.children[0]
             # check the the home screen variable is truly the home screen (and that we haven't moved to the
             # add credit screen
             if self.dashboard_object is not None and home_screen.name == 'home_screen':
-                print(self.dashboard_object.children[0])  # todo: remove
-                home_screen.ids.credit_balance_text.text = locale.currency(self.get_balance())
+                home_screen.ids.credit_balance_text.text = locale.currency(balance)
+                home_screen.ids.liters_remaining_text.text = round(balance / rate,
+                                                                   DIGITS_TO_ROUND).__str__() + " Liters"
                 home_screen.ids.rate_text.text = locale.currency(rate)
                 home_screen.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
                 home_screen.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
-                home_screen.ids.balance_24_hours.text = "$" + (volume_last_24_hours * rate).__str__()
+                home_screen.ids.balance_24_hours.text = locale.currency(volume_last_24_hours * rate).__str__()
                 home_screen.ids.orp_text.text = self.get_orp().__str__() + " mv"
-                home_screen.ids.tds_text.text = self.get_tds().__str__() + " mv"
+                home_screen.ids.tds_text.text = self.get_tds().__str__() + " ppm"
                 # convert unix timestamps to human-readable times for this
                 home_screen.ids.flowmeter_text.text = datetime.fromtimestamp(self.get_flowmeter()).__str__()
                 if self.last_downsync_time is not None:
@@ -108,7 +110,7 @@ class HomescreenApp(App):
             print("Exception retrieving balance: " + ex)
             balance = ERROR_CODE
 
-        return str(balance)
+        return balance
 
     # returns the rate per Liter (should this come from the API?)
     def get_rate(self):
@@ -124,8 +126,6 @@ class HomescreenApp(App):
             if data[2] is not None:
                 self.last_upsync_time = data[2]
 
-        print("rate")
-
         return Constants.CREDITS_PER_ML
 
     # returns the flow rate per minute for the past hour
@@ -138,9 +138,11 @@ class HomescreenApp(App):
         for data in flow_query:
             if data[0] is not None:
                 flow = data[0]
+                # convert to liters
+                flow /= 1000
 
         # divide the liters in the past hour by the total minutes in an hour
-        return flow / 60.0
+        return round(flow / 60.0, DIGITS_TO_ROUND)
 
     def get_volume_in_last_24_hours(self):
         volume = 0
@@ -151,6 +153,8 @@ class HomescreenApp(App):
         for data in volume_query:
             if data[0] is not None:
                 volume = data[0]
+                # convert to Liters
+                volume /= 1000
 
         return round(volume, DIGITS_TO_ROUND)
 
@@ -160,6 +164,11 @@ class HomescreenApp(App):
         orp_query = self.cur.execute("SELECT Millivolts FROM ORP ORDER BY Timestamp DESC LIMIT 1")
         for data in orp_query:
             orp = data[0]
+
+        # use dummy data if in demo mode
+        if Config.DEMO_MODE is True:
+            orp = random.randrange(400, 450, 1)
+
         return round(orp, DIGITS_TO_ROUND)
 
     def get_tds(self):
@@ -170,7 +179,7 @@ class HomescreenApp(App):
             tds = data[0]
 
         # TODO: IMPORTANT - this needs to be swapped out with real values after the demo in Stockholm
-        tds = random.randrange(60, 70, 1)
+        tds = random.randrange(195, 210, 1)
 
         return round(tds, DIGITS_TO_ROUND)
 

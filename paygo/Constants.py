@@ -5,21 +5,17 @@ DATABASE_NAME = (Path(__file__).parent.parent.__str__() + "/paygo.db")
 SENSOR_SLEEP_SECONDS = 10  # TODO: change to 5 minutes after testing is done
 DEVICE_ID = "1"
 # price in USD per ml of water
-PRICE_PER_ML = 0.0
-# use this to use dummy data for the GPIO pins when working with the code on a computer besides the pi
-IS_DEBUG = True
+PRICE_PER_ML = 0.02
 # the milliliters represented by each rising edge of the flowmeter
 ML_PER_PULSE = 2.2
 # how many milliliters before we write to the db
 FLOWMETER_THRESHOLD = 100
 FLOWMETER_UNITS = "milliliters"
-# how many credits buy how many milliliters
-CREDITS_PER_ML = 0.02
 # total seconds in an hour
 SECONDS_IN_HOUR = 3600
 
 # PINOUT
-FLOWMETER_PIN = "GPIO21"
+FLOWMETER_PIN = "GPIO26"
 RELAY_PIN = "GPIO20"
 ORP_PIN = "GPIO16"
 
