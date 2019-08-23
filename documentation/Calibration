@@ -1,1 +1,7 @@
 To calibrate, follow instructions at https://www.waveshare.com/wiki/Template:RPi_LCD_User_Manual for the LCD 3.5" B Screen
+
+You may also need to edit /usr/share/X11/xorg.conf.d/99-calibration.conf with the results of the calibration. If the touch seems to be inverted (i.e. the cursor is not brought to the place where your stylus hits the screen), you may need to add the following line to the end of the calibration file:
+
+Option "TransformationMatrix" "0 -1 1 1 0 0 0 0 1"
+
+See https://raspberrypi.stackexchange.com/questions/61053/tft-lcd-3-5-display-with-inverted-axis

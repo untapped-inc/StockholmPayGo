@@ -8,6 +8,10 @@
 
 RaspberryPiPassword
 
+*.mp4
+*.jpg
+*.jpeg
+
 UIScreens/*
 /Copy of Raspberry Pi Desktop/*
 
