@@ -50,6 +50,9 @@ class HomescreenApp(App):
 
     requested_credit = None
 
+    # when in demo mode, this variable counts how many cycles have passed since the last screen refresh
+    demo_count = 0
+
     def build(self):
         # set the locale - this can later be changed to whatever it needs to be once the demo is over
         locale.setlocale(locale.LC_ALL, '')
@@ -79,7 +82,8 @@ class HomescreenApp(App):
                 home_screen.ids.liters_remaining_text.text = round((balance / rate) / 1000,
                                                                    DIGITS_TO_ROUND).__str__() + " Liters"
                 home_screen.ids.rate_text.text = locale.currency(rate * 1000)
-                home_screen.ids.average_flow_text.text = round(self.get_flow_per_hour()/1000, DIGITS_TO_ROUND).__str__() + " Liters per Minute"
+                home_screen.ids.average_flow_text.text = round(self.get_flow_per_hour() / 1000,
+                                                               DIGITS_TO_ROUND).__str__() + " Liters per Minute"
                 home_screen.ids.volume_24_text.text = round((volume_last_24_hours / 1000),
                                                             DIGITS_TO_ROUND).__str__() + " Liters"
                 home_screen.ids.balance_24_hours.text = locale.currency(float(volume_last_24_hours * rate)).__str__()
@@ -92,6 +96,20 @@ class HomescreenApp(App):
                         self.last_downsync_time).__str__()
                 if self.last_upsync_time is not None:
                     home_screen.ids.upsync_text.text = datetime.fromtimestamp(self.last_upsync_time).__str__()
+
+                # in demo mode, move to the add credits screen every few cycles
+                if Config.DEMO_MODE:
+                    self.demo_count += 1
+                    if self.demo_count == 1:
+                        home_screen.ids.home_scroll.scroll_to(home_screen.ids.credit_balance_text)
+                    elif self.demo_count == 4:
+                        home_screen.ids.home_scroll.scroll_to(home_screen.ids.tds_text)
+                    elif self.demo_count == 7:
+                        home_screen.ids.home_scroll.scroll_to(home_screen.ids.pressure_text)
+                    elif self.demo_count >= 10:
+                        self.demo_count = 0
+                        self.open_add_credit_screen()
+
             time.sleep(UI_UPDATE_RATE)
 
     # return balance in US Dollars
@@ -205,6 +223,20 @@ class HomescreenApp(App):
             # blank everything out
             self.dashboard_object.children[0].ids.add_amount.text = ''
             self.dashboard_object.children[0].ids.new_balance_text.text = ''
+        # in demo mode, enter some numbers
+        if Config.DEMO_MODE:
+            time.sleep(1)
+            self.add_credit_button_click('1')
+            time.sleep(1)
+            self.add_credit_button_click('0')
+            time.sleep(1)
+            self.add_credit_button_click('.')
+            time.sleep(1)
+            self.add_credit_button_click('0')
+            time.sleep(1)
+            self.add_credit_button_click('0')
+            time.sleep(1)
+            self.confirm_transaction(self.dashboard_object.children[0].ids.add_amount.text)
 
     def cancel_add(self):
         self.requested_credit = None
@@ -267,6 +299,10 @@ class HomescreenApp(App):
             print("Error confirming transaction: " + ex.__str__())
         # move to the next screen
         self.root.current = 'confirm_screen'
+        if Config.DEMO_MODE:
+            # in demo mode, sleep 3 seconds, then confirm purchase
+            time.sleep(3)
+            self.purchase_credits()
 
     def purchase_credits(self):
         # TODO: stop the motor and valve to prevent any credit consumption while this transaction occurs

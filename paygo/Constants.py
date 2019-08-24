@@ -2,12 +2,12 @@ from pathlib import Path
 
 DATABASE_NAME = (Path(__file__).parent.parent.__str__() + "/paygo.db")
 # sleep time in milliseconds for the sensor reads
-SENSOR_SLEEP_SECONDS = 10  # TODO: change to 5 minutes after testing is done
+SENSOR_SLEEP_SECONDS = 1  # TODO: change to 5 minutes after testing is done
 DEVICE_ID = "1"
 # the milliliters represented by each rising edge of the flowmeter
 ML_PER_PULSE = 2.2
 # how many milliliters before we write to the db
-FLOWMETER_THRESHOLD = 100
+FLOWMETER_THRESHOLD = 1  # in production, we may want to increase this
 FLOWMETER_UNITS = "milliliters"
 # total seconds in an hour
 SECONDS_IN_HOUR = 3600
@@ -22,7 +22,7 @@ INSERT_CREDIT_LOG_SQL = "INSERT INTO CreditAuditLog (CreditID, DeviceID, Timesta
                         "(?), (?))"
 
 # how often the UI refreshes itself (in seconds)
-UI_UPDATE_RATE = 2
+UI_UPDATE_RATE = 1
 
 # decimal places to round to in the UI
 DIGITS_TO_ROUND = 3
