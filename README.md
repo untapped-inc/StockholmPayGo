@@ -13,7 +13,7 @@ Developer Notes: This project was originally developed with PyCharm IDE for the 
     * Assorted wires, barrel jacks, connectors, etc.
     
 Image from https://pinout.xyz/#
-![alt text](https://github.com/untapped-inc/StockholmPayGo/blob/master/GPIO.png)
+![](documentation/GPIO.png)
 
 ## Hardware Setup:
     * The Raspberry Pi is powered by a Micro-USB cable. The USB should be connected to a 3 amp adapter (i.e. a "fast-charger"). 
