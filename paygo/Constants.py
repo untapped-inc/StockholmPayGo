@@ -4,8 +4,6 @@ DATABASE_NAME = (Path(__file__).parent.parent.__str__() + "/paygo.db")
 # sleep time in milliseconds for the sensor reads
 SENSOR_SLEEP_SECONDS = 10  # TODO: change to 5 minutes after testing is done
 DEVICE_ID = "1"
-# price in USD per ml of water
-PRICE_PER_ML = 0.02
 # the milliliters represented by each rising edge of the flowmeter
 ML_PER_PULSE = 2.2
 # how many milliliters before we write to the db
@@ -24,7 +22,7 @@ INSERT_CREDIT_LOG_SQL = "INSERT INTO CreditAuditLog (CreditID, DeviceID, Timesta
                         "(?), (?))"
 
 # how often the UI refreshes itself (in seconds)
-UI_UPDATE_RATE = 5
+UI_UPDATE_RATE = 2
 
 # decimal places to round to in the UI
 DIGITS_TO_ROUND = 3

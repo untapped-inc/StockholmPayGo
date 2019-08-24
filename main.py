@@ -25,8 +25,7 @@ def set_device_id():
         devices_exist = True
     if devices_exist is False:
         # insert into the device table
-        cur.execute("INSERT INTO Device (DeviceID, PricePerML) values((?),(?))", (Constants.DEVICE_ID.__str__(),
-                                                                                  Constants.PRICE_PER_ML))
+        cur.execute("INSERT INTO Device (DeviceID, PricePerML) values((?))", (Constants.DEVICE_ID.__str__()))
         conn.commit()
 
 

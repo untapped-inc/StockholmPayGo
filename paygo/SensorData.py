@@ -13,12 +13,13 @@ from gpiozero import DigitalInputDevice, DigitalOutputDevice
 
 from paygo import Constants, Config
 from paygo.Constants import DATABASE_NAME, ML_PER_PULSE, FLOWMETER_THRESHOLD, DEVICE_ID, \
-    FLOWMETER_UNITS, PRICE_PER_ML, GET_BALANCE_QUERY, RELAY_PIN, SENSOR_SLEEP_SECONDS, INSERT_CREDIT_LOG_SQL
+    FLOWMETER_UNITS, GET_BALANCE_QUERY, RELAY_PIN, SENSOR_SLEEP_SECONDS, INSERT_CREDIT_LOG_SQL
 
 # global variable temporarily store the ml passing through the flowmeter until they can be written to the database
 flowmeter_milliliters_cache = 0.0
 # global variable to stores the user's credits between reads from the database
 credit_balance_cache = 0.0
+price_per_ml = 0
 
 if Config.IS_DEBUG is False:
     # used to pull the reading from the ADS1115 module (the ORP's ADC)
@@ -44,6 +45,10 @@ class SensorData(object):
         # a cursor is needed to write to the db
         cur = conn.cursor()
 
+        for device in cur.execute("SELECT PricePerML FROM DEVICE LIMIT 1"):
+            global price_per_ml
+            price_per_ml = device[0]
+
         global credit_balance_cache
 
         # loop until told to stop - read from the ORP, TDS, and write to the db along the way
@@ -62,6 +67,16 @@ class SensorData(object):
             # turn on the circuit if the balance is used
             if credit_balance_cache > 0.0 and Config.IS_DEBUG is False:
                 relay_module.on()
+
+            # simulate water flow if in demo mode
+            if Config.DEMO_MODE is True:
+                # count 60 pulses per second
+                i = 1
+                # don't flow when the balance reaches 0
+                while credit_balance_cache > 0 and i < 10 * SENSOR_SLEEP_SECONDS:
+                    count_flowmeter_pulse()
+                    i = i + 1
+                    time.sleep(0.001)
 
             # sleep for a few minutes
             time.sleep(SENSOR_SLEEP_SECONDS)
@@ -111,8 +126,6 @@ def flowmeter_manager():
 
 # function that is called every time a rising edge is detected on the flowmeter sensor
 def count_flowmeter_pulse():
-    conn = sqlite3.connect(DATABASE_NAME)
-    cur = conn.cursor()
     # increment the water counter until the threshold is breached
     # this is not done every time a pulse is detected to cut down on the database writes produced by this code
     global flowmeter_milliliters_cache
@@ -128,11 +141,14 @@ def count_flowmeter_pulse():
 
     # check for threshold breach
     if flowmeter_milliliters_cache >= FLOWMETER_THRESHOLD:
+        conn = sqlite3.connect(DATABASE_NAME)
+        cur = conn.cursor()
         # write another pulse to the database
         cur.execute("INSERT INTO WaterLog (FlowmeterReadingID, DeviceID, Timestamp, Value, Units) values((?), (?), "
-                    "(?), (?), (?))", (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()), flowmeter_milliliters_cache,
-                                       FLOWMETER_UNITS))
-        cur.execute(INSERT_CREDIT_LOG_SQL, (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()),
+                    "(?), (?), (?))",
+                    (uuid.uuid4().__str__(), DEVICE_ID, float(time.time()), flowmeter_milliliters_cache,
+                     FLOWMETER_UNITS))
+        cur.execute(INSERT_CREDIT_LOG_SQL, (uuid.uuid4().__str__(), DEVICE_ID, float(time.time()),
                                             credit_balance_cache))
         # commit both transactions
         conn.commit()
@@ -143,10 +159,11 @@ def count_flowmeter_pulse():
 
 
 def calculate_balance(credit_balance):
-    return credit_balance - (ML_PER_PULSE * PRICE_PER_ML)
+    return credit_balance - (ML_PER_PULSE * price_per_ml)
 
 
 # turns off the relay (which turns off the motor/solenoid)
 def disconnect_relay():
-    # turns the relay off
-    relay_module.off()
+    if Config.DEMO_MODE is False:
+        # turns the relay off
+        relay_module.off()

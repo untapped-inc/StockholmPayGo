@@ -76,12 +76,13 @@ class HomescreenApp(App):
             # add credit screen
             if self.dashboard_object is not None and home_screen.name == 'home_screen':
                 home_screen.ids.credit_balance_text.text = locale.currency(balance)
-                home_screen.ids.liters_remaining_text.text = round(balance / rate,
+                home_screen.ids.liters_remaining_text.text = round((balance / rate) / 1000,
                                                                    DIGITS_TO_ROUND).__str__() + " Liters"
-                home_screen.ids.rate_text.text = locale.currency(rate)
-                home_screen.ids.average_flow_text.text = self.get_flow_per_hour().__str__() + " Liters per Minute"
-                home_screen.ids.volume_24_text.text = volume_last_24_hours.__str__() + " Liters"
-                home_screen.ids.balance_24_hours.text = locale.currency(volume_last_24_hours * rate).__str__()
+                home_screen.ids.rate_text.text = locale.currency(rate * 1000)
+                home_screen.ids.average_flow_text.text = round(self.get_flow_per_hour()/1000, DIGITS_TO_ROUND).__str__() + " Liters per Minute"
+                home_screen.ids.volume_24_text.text = round((volume_last_24_hours / 1000),
+                                                            DIGITS_TO_ROUND).__str__() + " Liters"
+                home_screen.ids.balance_24_hours.text = locale.currency(float(volume_last_24_hours * rate)).__str__()
                 home_screen.ids.orp_text.text = self.get_orp().__str__() + " mv"
                 home_screen.ids.tds_text.text = self.get_tds().__str__() + " ppm"
                 # convert unix timestamps to human-readable times for this
@@ -138,23 +139,19 @@ class HomescreenApp(App):
         for data in flow_query:
             if data[0] is not None:
                 flow = data[0]
-                # convert to liters
-                flow /= 1000
 
-        # divide the liters in the past hour by the total minutes in an hour
+        # divide the ml in the past hour by the total minutes in an hour
         return round(flow / 60.0, DIGITS_TO_ROUND)
 
     def get_volume_in_last_24_hours(self):
         volume = 0
-        current_time = int(time.time())
+        current_time = float(time.time())
         start_time = current_time - (24 * SECONDS_IN_HOUR)
         volume_query = self.cur.execute("SELECT SUM(VALUE) FROM WaterLog WHERE TIMESTAMP BETWEEN (?) AND (?)",
                                         (start_time, current_time))
         for data in volume_query:
             if data[0] is not None:
                 volume = data[0]
-                # convert to Liters
-                volume /= 1000
 
         return round(volume, DIGITS_TO_ROUND)
 
@@ -284,7 +281,7 @@ class HomescreenApp(App):
             try:
                 total_balance = old_balance + float(self.requested_credit)
                 purchase_cursor.execute(Constants.INSERT_CREDIT_LOG_SQL,
-                                        (uuid.uuid4().__str__(), DEVICE_ID, int(time.time()),
+                                        (uuid.uuid4().__str__(), DEVICE_ID, float(time.time()),
                                          total_balance))
                 purchase_conn.commit()
                 success = True
